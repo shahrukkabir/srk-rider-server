@@ -107,6 +107,22 @@ async function run() {
             }
         });
 
+        // GET: list users (all or limited)
+        app.get("/users", verifyFBToken, verifyAdmin, async (req, res) => {
+            try {
+                const users = await usersCollection
+                    .find({})
+                    .project({ email: 1, role: 1, createdAt: 1 }) // optional projection
+                    .limit(100) // change limit as needed
+                    .toArray();
+                res.send(users);
+            } catch (err) {
+                console.error("Error getting users:", err);
+                res.status(500).send({ message: "Failed to fetch users" });
+            }
+        });
+
+
         // GET: Get user role by email
         app.get('/users/:email/role', async (req, res) => {
             try {
